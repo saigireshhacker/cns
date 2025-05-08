@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+
+void sortKey(int *pos, char *key, int k) {
+    for (int i = 0; i < k; i++) pos[i] = i;
+    for (int i = 0; i < k; i++)
+        for (int j = i + 1; j < k; j++)
+            if (key[pos[i]] > key[pos[j]]) {
+                int t = pos[i]; pos[i] = pos[j]; pos[j] = t;
+            }
+}
+
+void encrypt(char *msg, char *key, char *out) {
+    int len = strlen(msg), k = strlen(key), r = (len + k - 1) / k, idx = 0;
+    char grid[r][k]; int pos[k];
+    memset(grid, 'X', sizeof(grid));
+    for (int i = 0; i < len; i++) grid[i/k][i%k] = msg[i];
+    sortKey(pos, key, k);
+    for (int i = 0; i < k; i++)
+        for (int j = 0; j < r; j++)
+            out[idx++] = grid[j][pos[i]];
+    out[idx] = 0;
+}
+
+void decrypt(char *cipher, char *key, char *out) {
+    int len = strlen(cipher), k = strlen(key), r = (len + k - 1) / k, idx = 0;
+    char grid[r][k]; int pos[k];
+    sortKey(pos, key, k);
+    for (int i = 0; i < k; i++)
+        for (int j = 0; j < r; j++)
+            grid[j][pos[i]] = cipher[idx++];
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < k; j++)
+            out[i*k + j] = grid[i][j];
+    out[len] = 0;
+}
+
+int main() {
+    char msg[] = "IAMSAIGIRESHKVS", key[] = "KEY", enc[100], dec[100];
+    encrypt(msg, key, enc);
+    printf("Enc: %s\n", enc);
+    decrypt(enc, key, dec);
+    printf("Dec: %s\n", dec);
+}
+Enc: AAISVISGEKMIRHS
+Dec: IAMSAIGIRESHKVS
