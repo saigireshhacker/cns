@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <string.h>
+
+void encrypt(char *msg, char *enc) {
+    int len = strlen(msg), k = 0;
+    for (int i = 0; i < len; i += 2) enc[k++] = msg[i];     // First rail
+    for (int i = 1; i < len; i += 2) enc[k++] = msg[i];     // Second rail
+    enc[k] = '\0';
+}
+
+void decrypt(char *enc, char *dec) {
+    int len = strlen(enc), k = 0;
+    int mid = (len + 1) / 2;
+    for (int i = 0; i < mid; i++) {
+        dec[k] = enc[i];
+        if (i + mid < len) dec[k + 1] = enc[i + mid];
+        k += 2;
+    }
+    dec[len] = '\0';
+}
+
+int main() {
+    char msg[] = "HELLOFROMRAILFENCE", enc[100], dec[100];
+    encrypt(msg, enc);
+    printf("Encrypted: %s\n", enc);
+    decrypt(enc, dec);
+    printf("Decrypted: %s\n", dec);
+    return 0;
+}
+Encrypted: HLORMALECELFORIFNE
+Decrypted: HELLOFROMRAILFENCE
