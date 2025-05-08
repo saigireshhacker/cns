@@ -1,0 +1,32 @@
+#include <stdio.h>
+
+int main() {
+    char ch, mode;
+    int shift;
+
+    printf("Enter mode (e for encrypt, d for decrypt): ");
+    scanf(" %c", &mode); 
+    printf("Enter shift: ");
+    scanf("%d", &shift);
+    getchar(); 
+
+   
+    if (mode == 'd' || mode == 'D') {
+        shift = -shift;
+    }
+
+    printf("Enter text: ");
+    while ((ch = getchar()) != '\n') {
+        if (ch >= 'a' && ch <= 'z') {
+            ch = ((ch - 'a' + shift) % 26 + 26) % 26 + 'a';
+        } else if (ch >= 'A' && ch <= 'Z') {
+            ch = ((ch - 'A' + shift) % 26 + 26) % 26 + 'A';
+        }
+        putchar(ch);
+    }
+
+    printf("\n");
+    return 0;
+}
+Enter mode (e for encrypt, d for decrypt): saigiresh
+Enter shift: Enter text: mkmviwl
