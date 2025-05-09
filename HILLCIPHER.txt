@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MOD 26
+
+// Function to multiply 2x2 key matrix with a pair of letters
+void multiplyMatrix(int key[2][2], int vec[2], int res[2]) {
+    for (int i = 0; i < 2; i++) {
+        res[i] = 0;
+        for (int j = 0; j < 2; j++) {
+            res[i] += key[i][j] * vec[j];
+        }
+        res[i] = res[i] % MOD;
+    }
+}
+
+// Function to find modular inverse of a under modulo m
+int modInverse(int a, int m) {
+    a = a % m;
+    for (int x = 1; x < m; x++) {
+        if ((a * x) % m == 1) return x;
+    }
+    return -1; // No inverse exists
+}
+
+// Function to find inverse of 2x2 key matrix
+int inverseKey(int key[2][2], int inv[2][2]) {
+    int det = key[0][0]*key[1][1] - key[0][1]*key[1][0];
+    det = (det % MOD + MOD) % MOD; // Ensure positive
+    int invDet = modInverse(det, MOD);
+    if (invDet == -1) return 0; // Not invertible
+
+    inv[0][0] = key[1][1] * invDet % MOD;
+    inv[0][1] = -key[0][1] * invDet % MOD;
+    inv[1][0] = -key[1][0] * invDet % MOD;
+    inv[1][1] = key[0][0] * invDet % MOD;
+
+    // Adjust for negatives
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            inv[i][j] = (inv[i][j] + MOD) % MOD;
+
+    return 1;
+}
+
+void encrypt(char *msg, int key[2][2]) {
+    int len = strlen(msg);
+    if (len % 2 != 0) strcat(msg, "X"); // pad if odd length
+
+    printf("Encrypted text: ");
+    for (int i = 0; i < strlen(msg); i += 2) {
+        int vec[2] = { msg[i] - 'A', msg[i+1] - 'A' };
+        int res[2];
+        multiplyMatrix(key, vec, res);
+        printf("%c%c", res[0] + 'A', res[1] + 'A');
+    }
+    printf("\n");
+}
+
+void decrypt(char *cipher, int key[2][2]) {
+    int inv[2][2];
+    if (!inverseKey(key, inv)) {
+        printf("Key is not invertible. Decryption not possible.\n");
+        return;
+    }
+
+    printf("Decrypted text: ");
+    for (int i = 0; i < strlen(cipher); i += 2) {
+        int vec[2] = { cipher[i] - 'A', cipher[i+1] - 'A' };
+        int res[2];
+        multiplyMatrix(inv, vec, res);
+        printf("%c%c", res[0] + 'A', res[1] + 'A');
+    }
+    printf("\n");
+}
+
+int main() {
+    char text[100];
+    int key[2][2];
+    int choice;
+
+    printf("Enter 2x2 key matrix (integers only):\n");
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            scanf("%d", &key[i][j]);
+
+    printf("Press 1 to Encrypt or 2 to Decrypt: ");
+    scanf("%d", &choice);
+    getchar(); // clear newline
+
+    printf("Enter the message (uppercase letters only, no spaces): ");
+    fgets(text, sizeof(text), stdin);
+    text[strcspn(text, "\n")] = '\0';
+
+    if (choice == 1)
+        encrypt(text, key);
+    else if (choice == 2)
+        decrypt(text, key);
+    else
+        printf("Invalid choice.\n");
+
+    return 0;
+}
+Enter 2x2 key matrix (integers only):
+2 3
+3 4
+Press 1 to Encrypt or 2 to Decrypt: 1
+Enter the message (uppercase letters only, no spaces): A N E R
+Encrypted text: ,?,241ZN
