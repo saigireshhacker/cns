@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Function to generate the full key in case it's shorter than the message
+void generateKey(char *message, char *key, char *fullKey) {
+    int msgLen = strlen(message);
+    int keyLen = strlen(key);
+    for (int i = 0, j = 0; i < msgLen; i++) {
+        fullKey[i] = key[j];
+        j = (j + 1) % keyLen;
+    }
+    fullKey[msgLen] = '\0';
+}
+
+// Function to encrypt using Vigenère cipher
+void encrypt(char *message, char *key, char *cipher) {
+    char fullKey[100];
+    generateKey(message, key, fullKey);
+
+    for (int i = 0; message[i] != '\0'; i++) {
+        if (isalpha(message[i])) {
+            cipher[i] = ((toupper(message[i]) - 'A') + (toupper(fullKey[i]) - 'A')) % 26 + 'A';
+        } else {
+            cipher[i] = message[i]; // Keep non-alphabet characters as is
+        }
+    }
+    cipher[strlen(message)] = '\0';
+}
+
+// Function to decrypt using Vigenère cipher
+void decrypt(char *cipher, char *key, char *message) {
+    char fullKey[100];
+    generateKey(cipher, key, fullKey);
+
+    for (int i = 0; cipher[i] != '\0'; i++) {
+        if (isalpha(cipher[i])) {
+            message[i] = ((toupper(cipher[i]) - toupper(fullKey[i]) + 26) % 26) + 'A';
+        } else {
+            message[i] = cipher[i]; // Keep non-alphabet characters as is
+        }
+    }
+    message[strlen(cipher)] = '\0';
+}
+
+int main() {
+    char message[100], key[100], result[100];
+    int choice;
+
+    printf("Press 1 to Encrypt or 2 to Decrypt: ");
+    scanf("%d", &choice);
+    getchar();  // Clear newline from buffer
+
+    printf("Enter the message (no spaces, use uppercase or lowercase letters only): ");
+    fgets(message, sizeof(message), stdin);
+    message[strcspn(message, "\n")] = '\0';
+
+    printf("Enter the key (short word, letters only): ");
+    scanf("%s", key);
+
+    if (choice == 1) {
+        encrypt(message, key, result);
+        printf("Encrypted text: %s\n", result);
+    } else if (choice == 2) {
+        decrypt(message, key, result);
+        printf("Decrypted text: %s\n", result);
+    } else {
+        printf("Invalid choice.\n");
+    }
+
+    return 0;
+}
