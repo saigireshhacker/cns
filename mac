@@ -1,0 +1,31 @@
+import hmac
+import hashlib
+
+def generate_mac(message: str, key: str, algorithm: str = 'sha256') -> str:
+   
+    byte_key = key.encode('utf-8')
+    byte_msg = message.encode('utf-8')
+
+    # Create the HMAC object
+    mac = hmac.new(byte_key, byte_msg, getattr(hashlib, algorithm))
+    
+    # Return hexadecimal digest
+    return mac.hexdigest()
+
+def verify_mac(message: str, key: str, mac_to_verify: str, algorithm: str = 'sha256') -> bool:
+    
+    expected_mac = generate_mac(message, key, algorithm)
+    return hmac.compare_digest(expected_mac, mac_to_verify)
+
+# Example usage1
+if __name__ == "__main__":
+    msg = "sai giresh"
+    secret_key = "iam_santosh"
+    algorithm = "sha256"
+
+    mac = generate_mac(msg, secret_key, algorithm)
+    print(f"Generated MAC: {mac}")
+
+    # Verify
+    is_valid = verify_mac(msg, secret_key, mac, algorithm)
+    print("MAC is valid." if is_valid else "MAC is invalid.")
