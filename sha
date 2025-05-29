@@ -1,0 +1,41 @@
+import hashlib
+
+def generate_sha_hash(message: str, algorithm: str = 'sha256') -> str:
+    """
+    Generate SHA hash of the input message using the specified algorithm.
+
+    Parameters:
+    - message: The input string to hash.
+    - algorithm: The SHA algorithm to use (sha1, sha224, sha256, sha384, sha512).
+
+    Returns:
+    - Hexadecimal hash string.
+    """
+    # Convert the input message to bytes
+    message_bytes = message.encode('utf-8')
+
+    # Choose the hashing algorithm
+    if algorithm == 'sha1':
+        hash_obj = hashlib.sha1()
+    elif algorithm == 'sha224':
+        hash_obj = hashlib.sha224()
+    elif algorithm == 'sha256':
+        hash_obj = hashlib.sha256()
+    elif algorithm == 'sha384':
+        hash_obj = hashlib.sha384()
+    elif algorithm == 'sha512':
+        hash_obj = hashlib.sha512()
+    else:
+        raise ValueError("Unsupported algorithm. Use 'sha1', 'sha224', 'sha256', 'sha384', or 'sha512'.")
+
+    # Update the hash object with the message bytes
+    hash_obj.update(message_bytes)
+
+    # Return the hexadecimal digest
+    return hash_obj.hexdigest()
+
+# Example usage
+if __name__ == '__main__':
+    message = "iam saigiresh!"
+    for algo in ['sha1', 'sha224', 'sha256', 'sha384', 'sha512']:
+        print(f"{algo.upper()} hash of '{message}': {generate_sha_hash(message, algo)}")
